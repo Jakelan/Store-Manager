@@ -1,9 +1,10 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QPushButton, QFileDialog, QLabel, QVBoxLayout, QWidget, QComboBox, QLineEdit
+from database_manager import DatabaseManager
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QPushButton
+from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QWidget, QComboBox, QLineEdit, QAction, QMessageBox
 from PyQt5.QtGui import QColor
-import pandas as pd
-from sqlalchemy import create_engine
+from PyQt5.uic import loadUi
 
 class DetailsWindow(QWidget):
     def __init__(self, details):
@@ -27,12 +28,22 @@ class App(QMainWindow):
         self.databases = []
         self.loadExistingDatabases()
         self.database_path = None
-        self.title = 'Store Management App'
-        self.left = 100
-        self.top = 100
-        self.width = 1600
-        self.height = 1200
+        self.db_manager = DatabaseManager(self)
+        loadUi('myqtui.ui', self) # Load the UI file
         self.initUI()
+
+    def reloadDatabases(self):
+        self.databases = self.db_manager.getDatabases()  # Get the updated list of databases
+        self.combo_db.clear()  # Clear the current items in the combo box
+        self.combo_db.addItems(self.databases)
+
+    def showDetails(self):
+        button = self.sender()
+        row = button.property('row')
+        details = self.df.loc[row].to_dict()
+        self.details_window = DetailsWindow(details)
+    def loadExistingDatabases(self):  # Move this method to App class
+        self.databases = [f for f in os.listdir() if f.endswith('.db')]
 
     def updateTable(self, df):
         self.df = df
@@ -78,80 +89,32 @@ class App(QMainWindow):
         self.df.loc[row, 'SOLD PRICE'] = text
 
     def initUI(self):
-        self.table_widget = QTableWidget(self)
-        self.table_widget.setGeometry(50, 50, 1200, 800)
-        button = QPushButton('Open CSV', self)
-        button.setToolTip('Click here to open a CSV file')
-        button.move(50, 850)
-        button.clicked.connect(self.openFile)
+        self.table_widget = self.findChild(QTableWidget, 'tableWidget')
 
-        button_db = QPushButton('Open Existing DB', self)
-        button_db.setToolTip('Click here to open an existing database file')
-        button_db.move(250, 850)
-        button_db.clicked.connect(self.openExistingDB)
+        self.button_open_csv = self.findChild(QAction, 'actionOpen_CSV')
+        self.button_open_csv.triggered.connect(self.db_manager.openFile)
 
-        self.combo_db = QComboBox(self)
+        self.button_open_db = self.findChild(QPushButton, 'pushButton_2')
+        self.button_open_db.clicked.connect(self.db_manager.openExistingDB)
+
+        self.combo_db = self.findChild(QComboBox, 'comboBox')
         self.combo_db.addItems(self.databases)
-        self.combo_db.move(400, 850)
 
-        button_save = QPushButton('Save', self)
-        button_save.setToolTip('Click here to save changes to the database')
-        button_save.move(650, 850)
-        button_save.clicked.connect(self.saveToDB)
+        self.button_save = self.findChild(QAction, 'actionSave_DB')
+        self.button_save.triggered.connect(lambda: self.db_manager.saveToDB(self.df))
 
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
-        self.show()
+        self.button_reload_databases = self.findChild(QPushButton, 'pushButton')
+        self.button_reload_databases.clicked.connect(self.reloadDatabases)
 
-    def loadCSV(self, filePath):
-        # Create a new database file with a unique name
-        import uuid
-        db_name = f'store_{uuid.uuid4().hex}.db'
+        self.button_delete_db = self.findChild(QPushButton, 'pushButton_3')
+        self.button_delete_db.clicked.connect(self.db_manager.deleteSelectedDB)
 
-        df = pd.read_csv(filePath)
-        df['rowid'] = df.index + 1
-        df['STATUS'] = 'Not checked'
-        df['SOLD PRICE'] = ""  # Adding default SOLD PRICE column
-        engine = create_engine(f'sqlite:///{db_name}')
-        df.to_sql('store_data', engine, if_exists='fail', index=False)
-        self.updateTable(df)
-        self.loadExistingDatabases()  # Refresh the list of available database files
+        self.button_export_csv = self.findChild(QAction, 'actionExport_CSV')
+        self.button_export_csv.triggered.connect(self.db_manager.exportToCSV)
 
-    def openFile(self):
-        options = QFileDialog.Options()
-        filePath, _ = QFileDialog.getOpenFileName(self, "Open CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options)
-        if filePath:
-            self.loadCSV(filePath)
-
-    def showDetails(self):
-        button = self.sender()
-        row = button.property('row')
-        details = self.df.loc[row].to_dict()
-        self.details_window = DetailsWindow(details)
-
-    def loadExistingDatabases(self):
-        self.databases = [f for f in os.listdir() if f.endswith('.db')]
-
-    def openExistingDB(self):
-        selected_db = self.combo_db.currentText()
-        if selected_db:
-            self.database_path = selected_db
-            engine = create_engine(f'sqlite:///{selected_db}')
-            query = 'SELECT * FROM store_data'
-            df = pd.read_sql(query, engine)
-            if 'SOLD PRICE' not in df.columns:  # If SOLD PRICE column doesn't exist
-                df['SOLD PRICE'] = ""  # Adding default SOLD PRICE column
-            self.updateTable(df)
-
-    def saveToDB(self):
-        if self.database_path:
-            engine = create_engine(f'sqlite:///{self.database_path}')
-            self.df.to_sql('store_data', engine, if_exists='replace', index=False)
-            print("Saved to database:", self.database_path)
-        else:
-            print("No database selected. Cannot save.")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
+    ex.show()  # <-- Add this line
     sys.exit(app.exec_())
