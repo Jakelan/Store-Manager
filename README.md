@@ -1,85 +1,68 @@
-# Store Management App
+# Database Manager for Store Items
 
 ## Overview
 
-The Store Management App is a desktop application developed in Python using the PyQt5 library. It offers an intuitive graphical user interface for managing store inventory. With features like loading data from CSV files, saving to SQLite databases, and modifying the status and sold price of items, it provides a comprehensive solution for small to medium-sized retail stores.
+This application provides a graphical user interface for managing a store's inventory. Built with Python and PyQt5, it enables users to perform various database operations, such as importing data from CSV files, saving data to SQLite databases, managing different databases, and exporting data to CSV files.
 
-## Table of Contents
-
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [Support](#support)
-- [License](#license)
+The user can view item details, update statuses, and see sold prices for individual items within the application.
 
 ## Features
 
-- **Load CSV Files**: Import inventory data from CSV files.
-- **SQLite Database Support**: Open, create, and manage SQLite databases.
-- **Status Management**: Modify the status of items (e.g., Not Checked, Working, Sold).
-- **Edit Sold Prices**: Easily update the sold prices for individual items.
-- **Detailed Views**: View detailed information about each item.
-- **Save Functionality**: Save changes directly to the SQLite database.
-- **Intuitive UI**: A user-friendly interface that's easy to navigate and use.
+- Import data from CSV files.
+- Export data to CSV files.
+- Open existing SQLite databases.
+- Save changes to the SQLite databases.
+- View and edit the status of individual items.
+- Delete selected databases.
 
-## Installation
+## Prerequisites
 
-### Prerequisites
+You'll need the following packages installed:
 
-Make sure you have Python 3.x installed along with the following libraries:
-
+- Python (3.x recommended)
 - PyQt5
 - pandas
 - sqlalchemy
 
-You can install these libraries using pip:
+## Installation
 
-```bash
-pip install PyQt5 pandas sqlalchemy
-```
+You can install the required packages using pip:
 
-### Running the Application
+    ```bash
+    pip install PyQt5 pandas sqlalchemy
+    ```
+
+## Running the Application
 
 1. Clone the repository:
 
-```bash
-git clone https://github.com/Jakelan/Store-Manager.git
-```
+    ```bash
+    git clone https://github.com/Jakelan/Store-Manager.git
+    ```
 
-2. Navigate to the project directory:
+2. Navigate to the directory:
 
-```bash
-cd goosevs-store
-```
+    ```bash
+    cd your-repository
+    ```
 
-3. Run the main script:
+3. Run the `main.py` script:
 
-```bash
-python main.py
-```
+    ```bash
+    python main.py
+    ```
+
+The application window will open, and you can begin managing your databases.
 
 ## Usage
 
-1. **Open CSV**: Click the 'Open CSV' button to load a CSV file.
-2. **Open Existing DB**: Select an existing SQLite database from the dropdown and click 'Open Existing DB.'
-3. **Edit Records**: You can edit the status and sold price of items directly in the table.
-4. **View Details**: Click 'Details' to see more information about an item.
-5. **Save**: Click 'Save' to save any changes to the database.
-
-## Screenshots
-
-(You can insert images here to give users a visual idea of the application)
-
-## Contributing
-
-We welcome contributions from the community. Please read our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
-
-## Support
-
-If you encounter any issues or have questions about the application, please open an [issue](https://github.com/your-username/goosevs-store/issues) on GitHub.
+- **Open CSV**: Import a CSV file into a new database.
+- **Open Existing DB**: Select an existing database from the dropdown.
+- **Save DB**: Save changes to the selected database.
+- **Export CSV**: Export the current table to a CSV file.
+- **Delete DB**: Delete the selected database.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+[MIT License](LICENSE.md) or whatever license you prefer.
+
