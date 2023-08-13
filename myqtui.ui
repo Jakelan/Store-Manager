@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Store Manager</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>mighty-ducks.ico</normaloff>mighty-ducks.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -20,11 +24,20 @@
       <x>20</x>
       <y>10</y>
       <width>1081</width>
-      <height>421</height>
+      <height>441</height>
      </rect>
     </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Rounded</enum>
+    </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
+    </property>
+    <property name="tabsClosable">
+     <bool>true</bool>
+    </property>
+    <property name="movable">
+     <bool>true</bool>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -40,14 +53,19 @@
      <attribute name="title">
       <string>Tab 2</string>
      </attribute>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QGraphicsView" name="graphicsView"/>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>160</x>
       <y>460</y>
-      <width>411</width>
+      <width>801</width>
       <height>30</height>
      </rect>
     </property>
@@ -85,6 +103,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="text">
+        <string>Make Labels</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -104,6 +129,7 @@
     <addaction name="actionOpen_CSV"/>
     <addaction name="actionSave_DB"/>
     <addaction name="actionExport_CSV"/>
+    <addaction name="actionClose"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -121,6 +147,11 @@
   <action name="actionExport_CSV">
    <property name="text">
     <string>Export CSV</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
    </property>
   </action>
  </widget>

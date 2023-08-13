@@ -1,4 +1,4 @@
-import uuid
+from datetime import datetime
 import os
 import pandas as pd
 from sqlalchemy import create_engine
@@ -7,18 +7,24 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 class DatabaseManager:
     def __init__(self, app):
         self.app = app
+        self.current_db_name = ""
         self.engine = None  # Initialize the engine attribute to None
+
 
     def loadCSV(self, filePath):
         # Create a new database file with a unique name
-        db_name = f'store_{uuid.uuid4().hex}.db'
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        db_name = f'Goosevs_{timestamp}.db'
+        self.current_db_name = db_name
         df = pd.read_csv(filePath)
         df['rowid'] = df.index + 1
         df['STATUS'] = 'Not checked'
+        df['TO PRINT'] = 'Not Ready'
         df['SOLD PRICE'] = ""  # Adding default SOLD PRICE column
         engine = create_engine(f'sqlite:///{db_name}')
         df.to_sql('store_data', engine, if_exists='fail', index=False)
         self.app.updateTable(df)
+        self.app.updateStatusBar(self.current_db_name)
         self.app.loadExistingDatabases()   # Refresh the list of available database files
 
     def exportToCSV(self):
@@ -50,15 +56,19 @@ class DatabaseManager:
             # If there is an existing engine, dispose of it
             if self.engine:
                 self.engine.dispose()
-
+            self.current_db_name = os.path.basename(selected_db)
             self.database_path = selected_db
             self.engine = create_engine(f'sqlite:///{selected_db}')
             query = 'SELECT * FROM store_data'
             df = pd.read_sql(query, self.engine)
             if 'SOLD PRICE' not in df.columns:  # If SOLD PRICE column doesn't exist
                 df['SOLD PRICE'] = ""  # Adding default SOLD PRICE column
+            if 'TO PRINT' not in df.columns:  # If TO PRINT column doesn't exist
+                df['TO PRINT'] = "Not Ready"  # Adding default TO PRINT column
             self.app.updateTable(df)
-
+            self.app.updateStatusBar(self.current_db_name)
+    def getCurrentDBName(self):
+        return self.current_db_name
     def getDatabases(self):
         return [f for f in os.listdir() if f.endswith('.db')]
 
@@ -86,6 +96,3 @@ class DatabaseManager:
                     print(f"Deleted {selected_db}")
                 except Exception as e:
                     print(f"Could not delete {selected_db}: {e}")
-
-
-
